@@ -2,12 +2,12 @@ import { Router, Request, Response } from 'express';
 import { InMemoryTagRepository } from '../repositories/TagRepository';
 import { CacheTagRepositoryDecorator } from '../repositories/CacheTagRepositoryDecorator';
 import { ActiveRedirectionStrategy, InactiveRedirectionStrategy } from '../services/strategies/RedirectionStrategy';
-
+import { PostgresTagRepository } from '../repositories/PostgresTagRepository';
 const router = Router();
 
 // 1. Préparation (Injection de dépendances)
 // crée notre BDD en mémoire et l'enveloppe avec le Cache !
-const baseRepository = new InMemoryTagRepository();
+const baseRepository = new PostgresTagRepository();
 const tagRepository = new CacheTagRepositoryDecorator(baseRepository);
 
 
