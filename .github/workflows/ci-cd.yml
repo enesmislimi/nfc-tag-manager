@@ -78,8 +78,9 @@ jobs:
       with:
         context: .
         push: true
-        tags: ${{ id.meta.outputs.tags }}
-        labels: ${{ id.meta.outputs.labels }}
+        # On utilise "steps.meta..." au lieu de "id.meta..." !
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
 
   # 🚀 PARTIE 3 : DEPLOIEMENT EN STAGING (AUTOMATIQUE)
   deploy-staging:
