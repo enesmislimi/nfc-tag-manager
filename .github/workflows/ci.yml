@@ -1,0 +1,53 @@
+name: NFC Tag Manager CI
+
+# Déclencheurs : Le pipeline s'exécute à chaque push ou pull request sur main ou master
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    # 🐘 Infrastructure : On lance une base PostgreSQL temporaire pour la CI
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: nfc_tags
+          POSTGRES_PASSWORD: supersecretpassword
+        ports:
+          - 5432:5432
+        # On attend que PostgreSQL soit totalement prêt avant de lancer les étapes suivantes
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    # 1. Le robot télécharge le code de ton dépôt GitHub
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 2. Le robot installe Node.js version 20 sur sa machine virtuelle
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    # 3. Installation de toutes les dépendances du projet
+    - name: Install dependencies
+      run: npm install
+
+    # 4. Vérification de la compilation TypeScript (Vérifie qu'il n'y a aucune erreur rouge)
+    - name: Typecheck TypeScript
+      run: npx tsc --noEmit
+
+    # 5. Exécution des tests unitaires et vérification de la couverture
+    - name: Run tests with Jest
+      run: npm test
